@@ -5,12 +5,13 @@ import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener {
     static final int SCREEN_WIDTH = 600;
-    static final int SCREEN_HEIGHT = 600;
+    static final int SCREEN_HEIGHT = 700;
     static final int UNIT_SIZE = 25;
-    static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
+    static final int GAME_UNITS = (SCREEN_WIDTH * (SCREEN_HEIGHT - 100)) / UNIT_SIZE;
     static final int DELAY = 75;
     final int[] x = new int[GAME_UNITS];
     final int[] y = new int[GAME_UNITS];
+    static final int SCORE_AREA_HEIGHT = 25;
     int bodyParts = 6;
     int applesEaten;
     int appleX;
@@ -30,6 +31,10 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void startGame() {
+        for (int i = 0; i < bodyParts; i++) {
+            x[i] = 0;
+            y[i] = SCORE_AREA_HEIGHT + i * UNIT_SIZE;
+        }
         newApple();
         running = true;
         timer = new Timer(DELAY, this);
@@ -43,10 +48,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void draw(Graphics g) {
         if (running) {
-/*            for (int i = 0; i < SCREEN_HEIGHT / UNIT_SIZE; i++) {
-                g.drawLine(i * UNIT_SIZE, 0, i * UNIT_SIZE, SCREEN_HEIGHT);
-                g.drawLine(0, i * UNIT_SIZE, SCREEN_WIDTH, i * UNIT_SIZE);
-            }*/
+            g.drawLine(0, UNIT_SIZE, SCREEN_WIDTH, UNIT_SIZE);
 
             g.setColor(Color.red);
             g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
@@ -62,9 +64,15 @@ public class GamePanel extends JPanel implements ActionListener {
             }
 
             g.setColor(Color.red);
-            g.setFont(new Font("Ink Free", Font.BOLD, 40));
+            g.setFont(new Font("Ink Free", Font.BOLD, 20));
             FontMetrics metrics = getFontMetrics(g.getFont());
-            g.drawString("Score: " + applesEaten, (SCREEN_WIDTH - metrics.stringWidth("Score: " + applesEaten))/2, g.getFont().getSize());
+            g.drawString("Score: " + applesEaten, (SCREEN_WIDTH - metrics.stringWidth("Score: " + applesEaten)), g.getFont().getSize());
+
+            g.setColor(Color.red);
+            g.setFont(new Font("Ink Free", Font.BOLD, 20));
+            //FontMetrics metrics = getFontMetrics(g.getFont());
+            int m = (SCREEN_WIDTH - metrics.stringWidth(""));
+            g.drawString("Lives: " + applesEaten, 0, g.getFont().getSize());
         }
         else {
             gameOver(g);
@@ -73,7 +81,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void newApple() {
         appleX = random.nextInt((int)(SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
-        appleY = random.nextInt((int)(SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
+        appleY = random.nextInt((int)((SCREEN_HEIGHT - SCORE_AREA_HEIGHT)/ UNIT_SIZE)) * SCORE_AREA_HEIGHT;
     }
 
     public void move() {
@@ -96,6 +104,11 @@ public class GamePanel extends JPanel implements ActionListener {
                 x[0] = x[0] + UNIT_SIZE;
                 break;
         }
+
+        // Area for the score
+        if (y[0] < SCORE_AREA_HEIGHT) {
+            y[0] = SCORE_AREA_HEIGHT;
+        }
     }
 
     public void checkApple() {
@@ -115,20 +128,7 @@ public class GamePanel extends JPanel implements ActionListener {
             }
         }
 
-        // Checks collision with left border
-        if (x[0] < 0) {
-            running = false;
-        }
-        // Checks collision with right border
-        if (x[0] > SCREEN_WIDTH) {
-            running = false;
-        }
-        // Checks collision with upper border
-        if (y[0] < 0) {
-            running = false;
-        }
-        // Checks collision with bottom border
-        if (y[0] > SCREEN_HEIGHT) {
+        if (x[0] < 0 || x[0] > SCREEN_WIDTH || y[0] < SCORE_AREA_HEIGHT || y[0] > SCREEN_HEIGHT) {
             running = false;
         }
         if (!running) {
