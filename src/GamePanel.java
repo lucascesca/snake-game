@@ -148,7 +148,6 @@ public class GamePanel extends JPanel implements ActionListener {
             if (applesEaten % 5 == 0) {
                 currentDelay = Math.max(10, currentDelay - 5);
                 updateTimer();
-                System.out.println(currentDelay);
             }
             newApple();
         }
@@ -179,6 +178,9 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void resetSnake() {
+        applesEaten = 0;
+        bodyParts = 6;
+        currentDelay = 120;
         direction = 'R';
         for (int i = 0; i < bodyParts; i++) {
             x[i] = 0;
